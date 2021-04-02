@@ -1,12 +1,14 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from django.conf import settings
 
 from .models import Check, Printer
 from .serializers import CheckSerializer
 from django.template.loader import render_to_string
-
+from .tasks import make_pdf
 # Создание новых чеков по данным заказа
+
 @api_view(['POST'])
 def create_checks(request):
     order = request.data
@@ -36,7 +38,8 @@ def create_checks(request):
         serializer = CheckSerializer(check, data=data)
         if serializer.is_valid():
             serializer.save()
-        make_html(serializer.data)
+        print('order')
+        make_html(serializer.data, check)
 
     return Response(
         {"detail": "Чеки успешно созданы."},
@@ -44,7 +47,13 @@ def create_checks(request):
     )
 
 # Генерация html-шаблона для новых чеков
-def make_html(data):
+def make_html(data, check):
     template = 'kitchen_template.html' if data['type'] == 'k' \
         else 'client_template.html'
     html = render_to_string(template, data)
+    check_type = 'kitchen' if data['type'] == 'k' else 'client'
+    name = str(data['order']['id']) + '_' + check_type
+    with open(settings.MEDIA_DIR+'/html/'+name+'.html', 'w') as static_file:
+        static_file.write(html)
+        static_file.close()
+    make_pdf(check, name)

@@ -1,5 +1,6 @@
 from enum import Enum
 
+# Варианты типа чека
 class CheckTypes(Enum):
     k = 'kitchen'
     c = 'client'
