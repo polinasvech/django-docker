@@ -7,6 +7,8 @@ from .models import Check, Printer
 from .serializers import CheckSerializer
 from django.template.loader import render_to_string
 from .tasks import make_pdf
+
+
 # Создание новых чеков по данным заказа
 
 @api_view(['POST'])
@@ -38,22 +40,28 @@ def create_checks(request):
         serializer = CheckSerializer(check, data=data)
         if serializer.is_valid():
             serializer.save()
-        print('order')
-        make_html(serializer.data, check)
+        print('VALDATA ', serializer.data)
+        check.type = serializer.data['type']
+        check.order = serializer.data['order']
+        check.status = serializer.data['status']
+        check.save()
+        make_html(serializer.data, check.pk)
 
-    return Response(
-        {"detail": "Чеки успешно созданы."},
-        status=status.HTTP_200_OK
-    )
+        return Response(
+            {"detail": "Чеки успешно созданы."},
+            status=status.HTTP_200_OK
+        )
+
 
 # Генерация html-шаблона для новых чеков
-def make_html(data, check):
+def make_html(data, check_pk):
     template = 'kitchen_template.html' if data['type'] == 'k' \
         else 'client_template.html'
     html = render_to_string(template, data)
     check_type = 'kitchen' if data['type'] == 'k' else 'client'
     name = str(data['order']['id']) + '_' + check_type
-    with open(settings.MEDIA_DIR+'/html/'+name+'.html', 'w') as static_file:
+    print("ORDER ", data['order'])
+    with open(settings.MEDIA_DIR + '/html/' + name + '.html', 'w') as static_file:
         static_file.write(html)
         static_file.close()
-    make_pdf(check, name)
+    make_pdf(check_pk, name)

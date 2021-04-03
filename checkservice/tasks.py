@@ -18,7 +18,7 @@ default_queue = get_queue('default', connection=redis_conn)
 # scheduler = get_scheduler()
 
 @job
-def make_pdf(check, name=''):
+def make_pdf(check_pk, name=''):
     if not name:
         return 'Error'
     encoding = 'utf-8'
@@ -34,10 +34,11 @@ def make_pdf(check, name=''):
 
         }
         response = requests.post(settings.WKHTMLTOPDF_URL, data=json.dumps(data), headers=headers)
-        print("RESP ", response)
-        print('CHECKPK3 ', check)
 
+        check = Check.objects.get(pk=check_pk)
+        print('CHECK ', check)
         print(name + '.pdf')
+
         # Save the response contents to a file
         with open(settings.MEDIA_DIR + '/pdf/' + name + '.pdf', 'wb') as f:
             f.write(response.content)
@@ -46,6 +47,9 @@ def make_pdf(check, name=''):
         with open(settings.MEDIA_DIR + '/pdf/' + name + '.pdf', encoding='utf-8', errors='ignore') as f:
             check.pdf_file.save(name + '.pdf', File(f))
             f.close()
+
+        check.status = 'r'
+        check.save()
 
         # Удаляем html
         if os.path.exists(settings.MEDIA_DIR + '/html/' + name + '.html'):
@@ -76,5 +80,5 @@ for job in scheduler.get_jobs():
 # enqueue(debug_task)
 # worker = get_worker()
 # print('WORK ', worker.name, worker.hostname, worker.queues)
-# worker.work()
+# worker.work(burst=True)
 # burst=True

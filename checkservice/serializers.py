@@ -4,4 +4,4 @@ from .models import Printer, Check
 class CheckSerializer(serializers.ModelSerializer):
     class Meta:
         model = Check
-        fields = '__all__'
+        fields = ['type', 'order', 'status']
