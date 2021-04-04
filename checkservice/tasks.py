@@ -1,79 +1,44 @@
-from django_rq import job, get_worker, get_queue, get_scheduler
+from django_rq import job, get_scheduler
 import json
 import requests
 from base64 import b64encode
-from django.core.files import File
+from django.core.files.base import ContentFile
 
-import redis
 from django.conf import settings
-import base64
 import os
 
 from .models import Check
 
-redis_conn = redis.StrictRedis(host='', port='', db='', password='')
-default_queue = get_queue('default', connection=redis_conn)
-
+# Генерация pdf из html с использованием wkhtmltopdf
 @job
 def make_pdf(check_pk, name=''):
     if not name:
         return 'Error'
     encoding = 'utf-8'
     with open(settings.MEDIA_ROOT + '/html/' + name + '.html', 'rb') as open_file:
+        # меняем кодировку
         byte_content = open_file.read()
         base64_bytes = b64encode(byte_content)
         base64_string = base64_bytes.decode(encoding)
+        # подготавливаем данные для запроса
         data = {
             'contents': base64_string,
         }
         headers = {
-            'Content-Type': 'application/json',
-
+             'Content-Type': 'application/json',
         }
+        # отправляем запрос на http://<docker_host>:<port>/
         response = requests.post(settings.WKHTMLTOPDF_URL, data=json.dumps(data), headers=headers)
-
         check = Check.objects.get(pk=check_pk)
-        print('CHECK ', check)
-        print(name + '.pdf')
-
-        # Save the response contents to a file
-        with open(settings.MEDIA_ROOT + '/pdf/' + name + '.pdf', 'wb') as f:
-            f.write(response.content)
-            f.close()
-
-        print('name ', name)
-        with open(settings.MEDIA_ROOT + '/pdf/' + name + '.pdf', encoding='utf-8', errors='ignore') as f:
-            check.pdf_file.save(name + '.pdf', File(f))
-            f.close()
-
+        # сохраняем PDF в файл
+        check.pdf_file.save(settings.MEDIA_ROOT + '/pdf/' + name + '.pdf', ContentFile(response.content))
+        # изменяем статус чека на Rendered
         check.status = 'r'
         check.save()
+        open_file.close()
 
-        # Удаляем html
-        if os.path.exists(settings.MEDIA_ROOT + '/html/' + name + '.html'):
-            os.remove(settings.MEDIA_ROOT + '/html/' + name + '.html')
-        else:
-            print("The file does not exist")
-
-        try:
-            return + '<<<Debug task>>>'
-        except TypeError:
-            return 'no tasks now'
-
-# @job
-# def debug_scheduled_task():
-#     raise ValueError('Hey man, shit broke')
-#     # return 'Scheduled task'
-
-
-# Delete any existing jobs in the scheduler when the app starts up
-'''
-for job in scheduler.get_jobs():
-    job.delete()
-'''
-
-# enqueue(debug_task)
-# worker = get_worker()
-# print('WORK ', worker.name, worker.hostname, worker.queues)
-# worker.work(burst=True)
-# burst=True
+    # Удаляем html
+    if os.path.exists(settings.MEDIA_ROOT + '/html/' + name + '.html'):
+         os.remove(settings.MEDIA_ROOT + '/html/' + name + '.html')
+    else:
+         print("The file does not exist")
