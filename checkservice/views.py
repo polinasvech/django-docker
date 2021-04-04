@@ -2,11 +2,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.conf import settings
+from django.shortcuts import render
 
 from .models import Check, Printer
 from .serializers import CheckSerializer
 from django.template.loader import render_to_string
-from .tasks import make_pdff
+from .tasks import make_pdf
 from django.http import HttpResponse
 import django_rq
 
@@ -93,9 +94,15 @@ def check(self):
             status=status.HTTP_400_BAD_REQUEST
         )
     # Извлекаем бинарное содержимое PDF-файла
-    file = open(str(check.pdf_file), 'rb')
-    file_content = file.read();
-    file.close()
+    try:
+        file = open(str(check.pdf_file), 'rb')
+        file_content = file.read()
+        file.close()
+    except FileNotFoundError:
+        return Response(
+            {"error": "Файл с PDF не смог быть прочитан"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
     # изменяем статус чека на Printed
     check.status = 'p'
@@ -114,4 +121,7 @@ def make_html(data, check_pk):
     with open(settings.MEDIA_ROOT + '/html/' + name + '.html', 'w') as static_file:
         static_file.write(html)
         static_file.close()
-    django_rq.enqueue(make_pdff, check_pk, name)
+    django_rq.enqueue(make_pdf, check_pk, name)
+
+def index(request):
+    return render(request, "index.html")

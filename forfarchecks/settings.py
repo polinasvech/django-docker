@@ -125,7 +125,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-WKHTMLTOPDF_URL = 'http://172.17.0.1:80'  # http://<docker-host>:<port>/
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
+# http://<docker-host>:<port>/ fow wkhtmltopdf
+WKHTMLTOPDF_URL = 'http://172.17.0.1:80'
 
 # RQ (Redis Queue)
 # http://python-rq.org/

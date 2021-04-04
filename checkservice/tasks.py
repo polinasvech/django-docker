@@ -1,4 +1,4 @@
-from django_rq import job, get_queue
+from django_rq import job, get_scheduler
 import json
 import requests
 from base64 import b64encode
@@ -11,7 +11,7 @@ from .models import Check
 
 # Генерация pdf из html с использованием wkhtmltopdf
 @job
-def make_pdff(check_pk, name=''):
+def make_pdf(check_pk, name=''):
     if not name:
         return 'Error'
     encoding = 'utf-8'

@@ -5,7 +5,7 @@ from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedDrop
 
 
 class CheckAdmin(admin.ModelAdmin):
-    list_display = ('order_number', 'type', 'status', 'printer_name', 'printer_number')
+    list_display = ('order_number', 'type', 'status', 'printer_name', 'point')
     # Фильтр чеков по статусу, типу, принтеру
     list_filter = (
         ('status', ChoiceDropdownFilter),
@@ -20,13 +20,12 @@ class CheckAdmin(admin.ModelAdmin):
     def printer_name(self, obj):
         return obj.printer_id.name
 
-    def printer_number(self, obj):
-        return obj.printer_id.id
+    def point(self, obj):
+        return obj.printer_id.point_id
 
 
 class PrinterAdmin(admin.ModelAdmin):
     list_display = ('name', 'check_type', 'point_id', 'api_key')
-
 
 admin.site.register(Check, CheckAdmin)
 admin.site.register(Printer, PrinterAdmin)
