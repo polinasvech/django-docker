@@ -6,7 +6,8 @@ from django.conf import settings
 from .models import Check, Printer
 from .serializers import CheckSerializer
 from django.template.loader import render_to_string
-from .tasks import make_pdf
+from .tasks import make_pdff
+from django.http import HttpResponse
 import django_rq
 
 
@@ -45,10 +46,10 @@ def create_checks(request):
         check.save()
         make_html(serializer.data, check.pk)
 
-        return Response(
-            {"detail": "Чеки успешно созданы."},
-            status=status.HTTP_200_OK,
-        )
+    return Response(
+        {"detail": "Чеки успешно созданы."},
+        status=status.HTTP_200_OK,
+    )
 
 # Список доступных чеков для печати
 @api_view(['GET'])
@@ -91,12 +92,16 @@ def check(self):
             {"error": "Для данного чека не сгенерирован PDF-файл"},
             status=status.HTTP_400_BAD_REQUEST
         )
-    # изменяет статус чека на Printed
+    # Извлекаем бинарное содержимое PDF-файла
+    file = open(str(check.pdf_file), 'rb')
+    file_content = file.read();
+    file.close()
+
+    # изменяем статус чека на Printed
     check.status = 'p'
     check.save()
-    file = open(str(check.pdf_file), 'rb')
-    file_encoded = base64.b64encode(file.read())
-    return Response(file_encoded, content_type='application/pdf')
+
+    return HttpResponse(file_content, status=status.HTTP_200_OK, content_type='application/pdf')
 
 
 # Генерация html-шаблона для новых чеков
@@ -109,4 +114,4 @@ def make_html(data, check_pk):
     with open(settings.MEDIA_ROOT + '/html/' + name + '.html', 'w') as static_file:
         static_file.write(html)
         static_file.close()
-    django_rq.enqueue(make_pdf, check_pk, name)
+    django_rq.enqueue(make_pdff, check_pk, name)

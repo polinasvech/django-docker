@@ -29,6 +29,8 @@ services:
     command: python manage.py rqworker
     volumes:
       - .:/code
+    depends_on:
+      - web
 
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas

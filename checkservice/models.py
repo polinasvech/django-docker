@@ -16,6 +16,6 @@ class Printer(models.Model):
 class Check(models.Model):
     printer_id = models.ForeignKey('Printer', related_name='checks', on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=CheckTypes.choices())
-    order = JSONField()
+    order = JSONField(unique=True)
     status = models.CharField(max_length=1, choices=CheckStatus.choices())
-    pdf_file = models.FileField(blank=True, null=True, upload_to='pdf/')
+    pdf_file = models.FileField(blank=True, null=True)
