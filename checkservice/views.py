@@ -30,9 +30,7 @@ def create_checks(request):
             {"error": "Для данного заказа уже созданы чеки."},
             status=status.HTTP_400_BAD_REQUEST
         )
-    print('PRINTERSSSS ', printers)
     for printer in printers:
-        print('PRINTER ', printer)
         check = Check(printer_id=printer)
         data = {
             'type': printer.check_type,
@@ -42,18 +40,16 @@ def create_checks(request):
         serializer = CheckSerializer(check, data=data)
         if serializer.is_valid():
             serializer.save()
-        print('VALDATA ', serializer.data)
         check.type = serializer.data['type']
         check.order = serializer.data['order']
         check.status = serializer.data['status']
-        print('STATUS ', check.type)
         check.save()
         make_html(serializer.data, check.pk)
 
-    return Response(
-        {"detail": "Чеки успешно созданы."},
-        status=status.HTTP_200_OK
-    )
+        return Response(
+            {"detail": "Чеки успешно созданы."},
+            status=status.HTTP_200_OK,
+        )
 
 
 # Генерация html-шаблона для новых чеков
@@ -63,7 +59,6 @@ def make_html(data, check_pk):
     html = render_to_string(template, data)
     check_type = 'kitchen' if data['type'] == 'k' else 'client'
     name = str(data['order']['id']) + '_' + check_type
-    print("ORDER ", data['order'])
     with open(settings.MEDIA_ROOT + '/html/' + name + '.html', 'w') as static_file:
         static_file.write(html)
         static_file.close()

@@ -19,4 +19,4 @@ class Check(models.Model):
         ('p', 'printed')
     )
     status = models.CharField(max_length=1, choices=STATUS_CHOICES)
-    pdf_file = models.FileField(upload_to='media/pdf/', null=True)
+    pdf_file = models.FileField(blank=True, null=True, upload_to='pdf/')
