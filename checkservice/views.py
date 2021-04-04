@@ -11,7 +11,6 @@ import django_rq
 
 
 # Создание новых чеков по данным заказа
-
 @api_view(['POST'])
 def create_checks(request):
     order = request.data
@@ -50,6 +49,54 @@ def create_checks(request):
             {"detail": "Чеки успешно созданы."},
             status=status.HTTP_200_OK,
         )
+
+# Список доступных чеков для печати
+@api_view(['GET'])
+def new_checks(self):
+    try:
+        printer = Printer.objects.get(api_key=self.query_params.get('api_key', None))
+    except Printer.DoesNotExist:
+        return Response(
+            {"error": "Ошибка авторизации"},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    data = {'checks': []}
+    for check in Check.objects.filter(printer_id=printer, status='r'):
+        data['checks'].append({'id': check.pk})
+    return Response(data)
+
+# PDF-файл чека
+@api_view(['GET'])
+def check(self):
+    import base64
+    # Загружаем принтер, если не найден - возвращает ошибку
+    try:
+        printer = Printer.objects.get(api_key=self.query_params.get('api_key', None))
+    except Printer.DoesNotExist:
+        return Response(
+            {"error": "Ошибка авторизации"},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    # Загружаем чек, если не найден - возвращает ошибку
+    try:
+        check = Check.objects.get(printer_id=printer, pk=self.query_params.get('check_id'))
+    except Check.DoesNotExist:
+        return Response(
+            {"error": "Данного чека не существует"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    # Если к чеку не добавлен pdf - возвращает ошибку
+    if not check.pdf_file:
+        return Response(
+            {"error": "Для данного чека не сгенерирован PDF-файл"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    # изменяет статус чека на Printed
+    check.status = 'p'
+    check.save()
+    file = open(str(check.pdf_file), 'rb')
+    file_encoded = base64.b64encode(file.read())
+    return Response(file_encoded, content_type='application/pdf')
 
 
 # Генерация html-шаблона для новых чеков

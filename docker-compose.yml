@@ -18,6 +18,8 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - redis
+      - wkhtmltopdf
 
   redis:
     image: redis
@@ -27,8 +29,6 @@ services:
     command: python manage.py rqworker
     volumes:
       - .:/code
-    depends_on:
-      - web
 
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas

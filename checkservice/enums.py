@@ -5,9 +5,16 @@ class CheckTypes(Enum):
     kitchen = ('k', 'Kitchen')
     client = ('c', 'Client')
 
-    # @classmethod
-    # def choices(types):
-    #     return [(key.value[-1], key.name) for key in types]
+    @classmethod
+    def choices(types):
+        return [type.value for type in types]
+
+# Варианты статуса чека
+class CheckStatus(Enum):
+    new = ('n', 'New')
+    rendered = ('r', 'Rendered')
+    printed = ('p', 'Printed')
+
     @classmethod
     def choices(types):
         return [type.value for type in types]
