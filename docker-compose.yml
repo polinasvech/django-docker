@@ -22,13 +22,13 @@ services:
   redis:
     image: redis
 
-#  rq:
-#    build: .
-#    command: python manage.py rqworker default
-#    volumes:
-#      - .:/code
-#    links:
-#      - redis
+  rq:
+    build: .
+    command: python manage.py rqworker
+    volumes:
+      - .:/code
+    depends_on:
+      - web
 #
 #  rqscheduler:
 #    build: .

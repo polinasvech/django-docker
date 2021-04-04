@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField
 from .enums import CheckTypes
 
-
 class Printer(models.Model):
     name = models.CharField(max_length=255)
     api_key = models.CharField(max_length=36, unique=True)
@@ -20,4 +19,4 @@ class Check(models.Model):
         ('p', 'printed')
     )
     status = models.CharField(max_length=1, choices=STATUS_CHOICES)
-    pdf_file = models.FileField(upload_to='pdf/', null=True)
+    pdf_file = models.FileField(upload_to='media/pdf/', null=True)

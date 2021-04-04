@@ -14,15 +14,12 @@ from .models import Check
 redis_conn = redis.StrictRedis(host='', port='', db='', password='')
 default_queue = get_queue('default', connection=redis_conn)
 
-
-# scheduler = get_scheduler()
-
 @job
 def make_pdf(check_pk, name=''):
     if not name:
         return 'Error'
     encoding = 'utf-8'
-    with open(settings.MEDIA_DIR + '/html/' + name + '.html', 'rb') as open_file:
+    with open(settings.MEDIA_ROOT + '/html/' + name + '.html', 'rb') as open_file:
         byte_content = open_file.read()
         base64_bytes = b64encode(byte_content)
         base64_string = base64_bytes.decode(encoding)
@@ -40,11 +37,12 @@ def make_pdf(check_pk, name=''):
         print(name + '.pdf')
 
         # Save the response contents to a file
-        with open(settings.MEDIA_DIR + '/pdf/' + name + '.pdf', 'wb') as f:
+        with open(settings.MEDIA_ROOT + '/pdf/' + name + '.pdf', 'wb') as f:
             f.write(response.content)
             f.close()
 
-        with open(settings.MEDIA_DIR + '/pdf/' + name + '.pdf', encoding='utf-8', errors='ignore') as f:
+        print('name ', name)
+        with open(settings.MEDIA_ROOT + '/pdf/' + name + '.pdf', encoding='utf-8', errors='ignore') as f:
             check.pdf_file.save(name + '.pdf', File(f))
             f.close()
 
@@ -52,8 +50,8 @@ def make_pdf(check_pk, name=''):
         check.save()
 
         # Удаляем html
-        if os.path.exists(settings.MEDIA_DIR + '/html/' + name + '.html'):
-            os.remove(settings.MEDIA_DIR + '/html/' + name + '.html')
+        if os.path.exists(settings.MEDIA_ROOT + '/html/' + name + '.html'):
+            os.remove(settings.MEDIA_ROOT + '/html/' + name + '.html')
         else:
             print("The file does not exist")
 
@@ -61,9 +59,6 @@ def make_pdf(check_pk, name=''):
             return + '<<<Debug task>>>'
         except TypeError:
             return 'no tasks now'
-
-
-make_pdf.delay()
 
 # @job
 # def debug_scheduled_task():

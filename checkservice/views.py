@@ -7,6 +7,7 @@ from .models import Check, Printer
 from .serializers import CheckSerializer
 from django.template.loader import render_to_string
 from .tasks import make_pdf
+import django_rq
 
 
 # Создание новых чеков по данным заказа
@@ -19,18 +20,19 @@ def create_checks(request):
     printers = Printer.objects.filter(point_id=order['point_id'])
     if not printers:
         return Response(
-            {"detail": "Для данной точки не настроено ни одного принтера."},
+            {"error": "Для данной точки не настроено ни одного принтера."},
             status=status.HTTP_400_BAD_REQUEST
         )
     # Если чеки для данного заказа уже были созданы - возвращает ошибку.
     order = request.data
     if Check.objects.filter(order=order):
         return Response(
-            {"detail": "Для данного заказа уже созданы чеки."},
+            {"error": "Для данного заказа уже созданы чеки."},
             status=status.HTTP_400_BAD_REQUEST
         )
-
+    print('PRINTERSSSS ', printers)
     for printer in printers:
+        print('PRINTER ', printer)
         check = Check(printer_id=printer)
         data = {
             'type': printer.check_type,
@@ -44,13 +46,14 @@ def create_checks(request):
         check.type = serializer.data['type']
         check.order = serializer.data['order']
         check.status = serializer.data['status']
+        print('STATUS ', check.type)
         check.save()
         make_html(serializer.data, check.pk)
 
-        return Response(
-            {"detail": "Чеки успешно созданы."},
-            status=status.HTTP_200_OK
-        )
+    return Response(
+        {"detail": "Чеки успешно созданы."},
+        status=status.HTTP_200_OK
+    )
 
 
 # Генерация html-шаблона для новых чеков
@@ -61,7 +64,7 @@ def make_html(data, check_pk):
     check_type = 'kitchen' if data['type'] == 'k' else 'client'
     name = str(data['order']['id']) + '_' + check_type
     print("ORDER ", data['order'])
-    with open(settings.MEDIA_DIR + '/html/' + name + '.html', 'w') as static_file:
+    with open(settings.MEDIA_ROOT + '/html/' + name + '.html', 'w') as static_file:
         static_file.write(html)
         static_file.close()
-    make_pdf(check_pk, name)
+    django_rq.enqueue(make_pdf, check_pk, name)

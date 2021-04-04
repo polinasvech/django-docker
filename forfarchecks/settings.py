@@ -56,7 +56,8 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'forfarchecks.urls'
 
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
-MEDIA_DIR = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = '/media/'
 
 TEMPLATES = [
     {
