@@ -3,6 +3,8 @@
 from django.db import migrations, models
 import django.db.models.deletion
 
+from django.contrib.postgres.fields import JSONField
+
 
 class Migration(migrations.Migration):
 
@@ -27,7 +29,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('type', models.CharField(choices=[('k', 'kitchen'), ('c', 'client')], max_length=1)),
-                ('order', models.JSONField()),
+                ('order', JSONField()),
                 ('status', models.CharField(choices=[('n', 'new'), ('r', 'rendered'), ('p', 'printed')], max_length=1)),
                 ('pdf_file', models.FileField(null=True, upload_to='pdf/')),
                 ('printer_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='checks', to='checkservice.printer')),

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_rq',
     'checkservice'
 ]
 
@@ -55,6 +56,8 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'forfarchecks.urls'
 
 TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = '/media/'
 
 TEMPLATES = [
     {
@@ -127,3 +130,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+WKHTMLTOPDF_URL = 'http://172.17.0.1:80'
+
+# RQ (Redis Queue)
+# http://python-rq.org/
+
+RQ_QUEUES = {
+    'default': {
+        'URL': os.getenv('REDIS_URL', 'redis://redis/0'),
+    }
+}
+
+RQ = {
+    'host': 'redis',
+    'db': '0',
+}
