@@ -1,4 +1,4 @@
-from django_rq import job, get_scheduler
+from django_rq import job
 import json
 import requests
 from base64 import b64encode

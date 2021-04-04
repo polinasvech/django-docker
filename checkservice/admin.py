@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from checkservice.models import Check, Printer
-from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedDropdownFilter, ChoiceDropdownFilter
+from django_admin_listfilter_dropdown.filters import RelatedDropdownFilter, ChoiceDropdownFilter
 
 
 class CheckAdmin(admin.ModelAdmin):
