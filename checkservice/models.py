@@ -9,13 +9,19 @@ class Printer(models.Model):
     check_type = models.CharField(max_length=1, choices=CheckTypes.choices())
     point_id = models.IntegerField()
 
-    def __str__(self):
+    def _str_(self):
         return self.name
 
 # Модель чека
 class Check(models.Model):
     printer_id = models.ForeignKey('Printer', related_name='checks', on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=CheckTypes.choices())
-    order = JSONField(unique=True)
+    order = JSONField()
     status = models.CharField(max_length=1, choices=CheckStatus.choices())
     pdf_file = models.FileField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('order', 'type', 'printer_id')
+        indexes = [
+            models.Index(fields=['order']),
+        ]
