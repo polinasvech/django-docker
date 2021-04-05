@@ -123,5 +123,6 @@ def make_html(data, check_pk):
         static_file.close()
     django_rq.enqueue(make_pdf, check_pk, name)
 
+# Начальная страница
 def index(request):
     return render(request, "index.html")
