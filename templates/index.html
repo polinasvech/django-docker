@@ -14,6 +14,9 @@
           <h1 class="mt-2">Printer API</h1>
           <hr class="mt-0 mb-4">
             <div>
+                <p>
+                   <img src="{% static 'images/index.jpg' %}" alt="welcome" width="500px" align="middle" >
+                </p>
                 <p> Для создания чеков передите на http://localhost:8000/create_checks/ </p>
                 <p> Для получения списка новых чеков перейдите на
                     http://localhost:8000/new_checks/?api_key=&lt;printer_api_key&gt;/ </p>
@@ -21,9 +24,30 @@
                 <p> Для просмотра всех чеков перейдите на http://localhost:8000/admin/checkservice/check/ </p>
                 <p> Для просмотра всех принтеров http://localhost:8000/admin/checkservice/printer/ </p>
                 <p> Для отслеживания работы воркера перейдите на http:/localhost:8000/admin/rq/ </p>
-                <p>
-                   <img src="{% static 'images/index.jpg' %}" alt="welcome" width="450px" align="middle" >
-                </p>
+                <hr>
+                <p> Во время первого запуска из корня проекта необходимо выполнить
+                <code>docker-compose build</code> </p>
+                <p> Если сборка завершилась без ошибок, выполняем <code>docker-compose up -d</code>
+                чтобы запустить контейнеры в фоновом режиме.  </p>
+                <p> Затем выведем с помощью команды <code>docker ps</code> выведем информацию о запущенных контейнерах,
+                    среди которых найдем контейнер web.</p>
+                <p> <img src="{% static 'images/docker-ps.png' %}" alt="docker ps" width="700px" align="middle" > </p>
+                 <p> Далее создаем и прогоняем миграции с помощью команд
+                     <p><code>docker exec -it  &lt;id контейнера web&gt; python manage.py makemigrations</code></p>
+                     <p><code>docker exec -it &lt;id контейнера web&gt; python manage.py migrate</code></p>
+                 </p>
+                <p> Затем создаем пользователя для входа административный раздел
+                <p><code>docker exec -it &lt;id контейнера web&gt; python manage.py createsuperuser</code></p>
+                Введенные имя пользователя и пароль будут использоваться для
+                доступа к http://localhost:8000/admin/checkservice/...</p>
+                <p> Также загрузим начальные данные для таблицы принтеров с помощью
+                <p><code>docker exec -it &lt;id контейнера web&gt; python manage.py loaddata printer_data.json</code></p>
+                Введенные имя пользователя и пароль будут использоваться для
+                доступа к http://localhost:8000/admin/checkservice/...</p>
+                <p> Чтобы остановить работу всех контейнеров
+                <p><code>docker stop $(docker ps -q)</code></p> </p>
+                <p> В дальшейшем для запуска проекта можно использовать
+                <p><code>docker-compose up</code></p> </p>
             </div>
         </div>
       </div>
