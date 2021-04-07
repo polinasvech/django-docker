@@ -4,7 +4,6 @@ from django.shortcuts import render
 from .utils import make_html
 from .models import Check, Printer
 from .forms import CheckForm
-from .enums import CheckStatus
 from django.http import HttpResponse, JsonResponse
 
 
@@ -12,14 +11,13 @@ from django.http import HttpResponse, JsonResponse
 def create_checks(request):
     if request.method == "POST":
         order = json.loads(request.POST.get('order'))
-        print(order, type(order))
 
         # Если у точки нет ни одного принтера - возвращает ошибку
         printers = Printer.objects.filter(point_id=order['point_id'])
         if not printers:
             return JsonResponse(
                 {"error": "Для данной точки не настроено ни одного принтера"},
-                status=400
+                status=400,
             )
         # Если чеки для данного заказа уже были созданы - возвращает ошибку.
         if Check.objects.filter(order=order):
@@ -32,13 +30,13 @@ def create_checks(request):
             data = {
                 'type': printer.check_type,
                 'order': order,
-                'status': CheckStatus.new.value[0]
+                'status': Check.STATUS.NEW
             }
             check.type = printer.check_type
             check.order = order
-            check.status = CheckStatus.new.value[0]
+            check.status = Check.STATUS.NEW
             check.save()
-            make_html(data, check.pk)
+            make_html(data, check.id)
 
         return JsonResponse(
             {"detail": "Чеки успешно созданы"},
@@ -58,9 +56,11 @@ def new_checks(request):
             {"error": "Ошибка авторизации"},
             status=401
         )
-    data = {'checks': []}
-    for check in Check.objects.filter(printer_id=printer, status='r'):
-        data['checks'].append({'id': check.pk})
+    data = {
+        'checks': [
+            {'id': check.pk} for check in Check.objects.filter(printer_id=printer, status=Check.STATUS.RENDERED)
+        ]
+    }
     return JsonResponse(data)
 
 # PDF-файл чека
@@ -99,7 +99,7 @@ def check(request):
         )
 
     # изменяем статус чека на Printed
-    check.status = CheckStatus.printed.value[0]
+    check.status = Check.STATUS.PRINTED
     check.save()
 
     return HttpResponse(file_content, status=200, content_type='application/pdf')
