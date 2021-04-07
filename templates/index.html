@@ -17,37 +17,43 @@
                 <p>
                    <img src="{% static 'images/index.jpg' %}" alt="welcome" width="500px" align="middle" >
                 </p>
-                <p> Для создания чеков передите на http://localhost:8000/create_checks/ </p>
-                <p> Для получения списка новых чеков перейдите на
-                    http://localhost:8000/new_checks/?api_key=&lt;printer_api_key&gt;/ </p>
-                <p> Для получения PDF-файла чека перейдите на http://localhost:8000/check/?api_key=&lt;priner_api_key&gt;&check_id=&lt;check_id> </p>
-                <p> Для просмотра всех чеков перейдите на http://localhost:8000/admin/checkservice/check/ </p>
-                <p> Для просмотра всех принтеров http://localhost:8000/admin/checkservice/printer/ </p>
-                <p> Для отслеживания работы воркера перейдите на http:/localhost:8000/admin/rq/ </p>
+                <h3>Доступные методы</h3>
+                <div>
+                    <p> Для создания чеков передите на <a href="#" class="link-primary">http://localhost:8000/create_checks/</a> </p>
+                    <p> Для получения списка новых чеков перейдите на
+                    <a href="#" class="link-primary">http://localhost:8000/new_checks/?api_key=&lt;printer_api_key&gt;/</a> </p>
+                    <p> Для получения PDF-файла чека перейдите на
+                        <a href="#" class="link-primary">http://localhost:8000/check/?api_key=&lt;priner_api_key&gt;&check_id=&lt;check_id></a>
+                </div>
+                <div>
+                     <p> Для просмотра всех чеков перейдите на
+                        <a href="#" class="link-primary">http://localhost:8000/admin/checkservice/check/</a> </p>
+                     <p> Для просмотра всех принтеров
+                         <a href="#" class="link-primary">http://localhost:8000/admin/checkservice/printer/</a> </p>
+                </div>
+                <div>
+                    <p> Для отслеживания работы воркера перейдите на
+                        <a href="#" class="link-primary">http:/localhost:8000/admin/rq/</a> </p>
+                </div>
                 <hr>
-                <p> Во время первого запуска из корня проекта необходимо выполнить
-                <code>docker-compose build</code> </p>
-                <p> Если сборка завершилась без ошибок, выполняем <code>docker-compose up -d</code>
-                чтобы запустить контейнеры в фоновом режиме.  </p>
-                <p> Затем выведем с помощью команды <code>docker ps</code> выведем информацию о запущенных контейнерах,
-                    среди которых найдем контейнер web.</p>
-                <p> <img src="{% static 'images/docker-ps.png' %}" alt="docker ps" width="700px" align="middle" > </p>
-                 <p> Далее создаем и прогоняем миграции с помощью команд
-                     <p><code>docker exec -it  &lt;id контейнера web&gt; python manage.py makemigrations</code></p>
-                     <p><code>docker exec -it &lt;id контейнера web&gt; python manage.py migrate</code></p>
-                 </p>
-                <p> Затем создаем пользователя для входа административный раздел
-                <p><code>docker exec -it &lt;id контейнера web&gt; python manage.py createsuperuser</code></p>
-                Введенные имя пользователя и пароль будут использоваться для
-                доступа к http://localhost:8000/admin/checkservice/...</p>
-                <p> Также загрузим начальные данные для таблицы принтеров с помощью
-                <p><code>docker exec -it &lt;id контейнера web&gt; python manage.py loaddata printer_data.json</code></p>
-                Введенные имя пользователя и пароль будут использоваться для
-                доступа к http://localhost:8000/admin/checkservice/...</p>
-                <p> Чтобы остановить работу всех контейнеров
-                <p><code>docker stop $(docker ps -q)</code></p> </p>
-                <p> В дальшейшем для запуска проекта можно использовать
-                <p><code>docker-compose up</code></p> </p>
+                <h3>Порядок запуска</h3>
+                <div>
+                    <p> 1. Устанавливаем зависимости
+                        <code> pip install -r requirements.txt </code> </p>
+                    <p> 2. В фоновом режиме запускаем необходимые для работы сервисы
+                        <code> docker-compose up -d </code> </p>
+                    <p> 3. Создаем и прогоняем миграции <br>
+                        <code>python manage.py makemigrations</code> <br>
+                        <code>python manage.py migrate</code>  </p>
+                    <p> 4. Создаем пользователя для доступа в административный раздел
+                        <code> python manage.py createsuperuser </code> </p>
+                    <p> 5. Загружаем начальные данные для таблицы принтеров
+                        <code> python manage.py loaddata printer_data.json </code></p>
+                    <p> 6. Запускаем воркер
+                        <code> python manage.py rqworker </code></p>
+                    <p> 7. Запускаем сервер
+                        <code> python manage.py runserver </code></p>
+                </div>
             </div>
         </div>
       </div>

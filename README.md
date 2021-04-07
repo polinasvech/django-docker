@@ -3,58 +3,48 @@
 Для создания чеков передите на 
 http://localhost:8000/create_checks/
 
---------------------------------------
 Для получения списка новых чеков перейдите на 
-http://localhost:8000/new_checks/?api_key=<printer_api_key>
+http://localhost:8000/new_checks/?api_key=<printer_api_key>/
 
-Для получения PDF-файла чека перейдите на http://localhost:8000:8000/check/?api_key=<priner_api_key>&check_id=<check_id>>
+Для получения PDF-файла чека перейдите на http://localhost:8000/check/?api_key=<priner_api_key>&check_id=<check_id>/
 
--------------------------------------
+--------------------------------------------------------
 Для просмотра всех чеков перейдите на http://localhost:8000/admin/checkservice/check/
 
 Для просмотра всех принтеров http://localhost:8000/admin/checkservice/printer/
 
+Для входа использовать данные пользователя, созданного на шаге 4.
+
 -------------------------------------------
 Для отслеживания работы воркера перейдите на http://localhost:8000/admin/rq/
 ___________________________________________
-Во время **первого** запуска из корня проекта необходимо выполнить
+**Порядок запуска**
+1. Устанавливаем зависимости
 ```
-docker-compose build
+pip install -r requirements.txt
 ```
-Если сборка завершилась без ошибок, выполняем 
+2. В фоновом режиме запускаем необходимые для работы сервисы
 ```
 docker-compose up -d
 ```
-чтобы запустить контейнеры в фоновом режиме.
-
-Затем выведем с помощью команды 
+3. Создаем и прогоняем миграции
 ```
-docker ps
+python manage.py makemigrations
+python manage.py migrate
 ```
-выведем информацию о запущенных контейнерах, среди которых найдем контейнер *web*.
-![alt text](static/images/docker-ps.png "Running containers")
-
-Далее создаем и прогоняем миграции с помощью команд
+4. Создаем пользователя для доступа в административный раздел
 ```
-docker exec -it <id контейнера web> python manage.py makemigrations
-docker exec -it <id контейнера web> python manage.py migrate
+python manage.py createsuperuser
 ```
-Затем создаем пользователя для входа административный раздел
-````
-docker exec -it <id контейнера web> python manage.py createsuperuser
-````
-Введенные имя пользователя и пароль будут использоваться для
-доступа к http://localhost:8000/admin/checkservice/...
-
-Также загрузим начальные данные для таблицы принтеров с помощью 
+5. Загружаем начальные данные для таблицы принтеров
 ```
-docker exec -it <id контейнера web> python manage.py loaddata printer_data.json
+python manage.py loaddata printer_data.json
 ```
-Чтобы остановить работу всех контейнеров
+6. Запускаем воркер
 ```
-docker stop $(docker ps -q)
+python manage.py rqworker
 ```
-В дальшейшем для запуска проекта можно использовать
+7. Запускаем сервер
 ```
-docker-compose up
+python manage.py runserver
 ```

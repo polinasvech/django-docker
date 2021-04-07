@@ -8,5 +8,5 @@ urlpatterns = [
     url('create_checks/', views.create_checks),
     url('new_checks/', views.new_checks),
     url('check/', views.check),
-    url('', views.index),
+    url('', views.index)
 ]

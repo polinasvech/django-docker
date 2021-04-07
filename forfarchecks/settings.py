@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'django_rq',
     'django_admin_listfilter_dropdown',
     'checkservice'
@@ -85,7 +84,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'HOST': '0.0.0.0',
         'PORT': 5432,
     }
 }
@@ -137,11 +136,9 @@ WKHTMLTOPDF_URL = 'http://172.17.0.1:80'
 
 RQ_QUEUES = {
     'default': {
-        'URL': os.getenv('REDIS_URL', 'redis://redis/0'),
+        'HOST': '0.0.0.0',
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 360,
     }
-}
-
-RQ = {
-    'host': 'redis',
-    'db': '0',
 }

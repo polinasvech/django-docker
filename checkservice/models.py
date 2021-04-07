@@ -9,7 +9,7 @@ class Printer(models.Model):
     check_type = models.CharField(max_length=1, choices=CheckTypes.choices())
     point_id = models.IntegerField()
 
-    def _str_(self):
+    def __str__(self):
         return self.name
 
 # Модель чека
