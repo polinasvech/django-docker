@@ -2,10 +2,5 @@ Django==1.11.28
 psycopg2-binary==2.8.4
 requests==2.23.0
 django-cors-headers==3.2.1
-rq==1.3.0
-rq-scheduler==0.5.1
+rq==1.2
 django-rq==2.1.0
-djangorestframework<=3.11
-requests
-wkhtmltopdf
-django-admin-list-filter-dropdown==1.0.2

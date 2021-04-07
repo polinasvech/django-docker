@@ -3,9 +3,9 @@
     "model": "checkservice.printer",
     "pk": 1,
     "fields": {
-      "name": "kitchen-printer-1",
+      "name": "kitchenprinter1",
       "api_key": "e7386311-cea6-46e6-887c-7065a642bdd3",
-      "check_type": "k",
+      "check_type": "Kitchen",
       "point_id": 1
     }
   },
@@ -13,9 +13,9 @@
     "model": "checkservice.printer",
     "pk": 2,
     "fields": {
-      "name": "client-printer-1",
+      "name": "clientprinter1",
       "api_key": "3bc61d01-d7b0-4c54-beb3-ac9c56ea5c4f",
-      "check_type": "c",
+      "check_type": "Client",
       "point_id": 1
     }
   },
@@ -23,9 +23,9 @@
     "model": "checkservice.printer",
     "pk": 3,
     "fields": {
-      "name": "kitchen-printer-2",
+      "name": "kitchenprinter2",
       "api_key": "7366388b-db2f-4a28-9c1b-729eebebb514",
-      "check_type": "k",
+      "check_type": "Kitchen",
       "point_id": 2
     }
   },
@@ -33,9 +33,9 @@
     "model": "checkservice.printer",
     "pk": 4,
     "fields": {
-      "name": "client-printer-2",
+      "name": "clientprinter2",
       "api_key": "8c7f28d2-793c-416f-9d5f-d94f9ea298b6",
-      "check_type": "c",
+      "check_type": "Client",
       "point_id": 2
     }
   }

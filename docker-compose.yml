@@ -9,28 +9,14 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-  web:
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/code
     ports:
-      - "8000:8000"
-    depends_on:
-      - db
-      - redis
-      - wkhtmltopdf
+      - "5432:5432"
 
   redis:
     image: redis
+    ports:
+      - "6379:6379"
 
-  rq:
-    build: .
-    command: python manage.py rqworker
-    volumes:
-      - .:/code
-    depends_on:
-      - web
 
   wkhtmltopdf:
     image: openlabs/docker-wkhtmltopdf-aas
